@@ -16,7 +16,8 @@ final class NeriToolchain {
     static String compiler(Project project) {
         String configured = PropertiesComponent.getInstance(project).getValue(KEY);
         if (configured != null && !configured.isBlank()) return configured;
-        Path installed = Path.of(System.getProperty("user.home"), ".neri", "bin", "neri");
+        String executable = System.getProperty("os.name").startsWith("Windows") ? "neri.exe" : "neri";
+        Path installed = Path.of(System.getProperty("user.home"), ".neri", "bin", executable);
         return Files.isExecutable(installed) ? installed.toString() : "neri";
     }
 }

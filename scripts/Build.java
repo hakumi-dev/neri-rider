@@ -47,9 +47,9 @@ class Build {
         Path javaHome = Path.of(System.getProperty("java.home"));
         String javac = javaHome.resolve("bin/javac").toString();
         String java = javaHome.resolve("bin/java").toString();
-        String sdk = String.join(File.pathSeparator, rider.resolve("lib/*").toString(),
-                rider.resolve("plugins/textmate-plugin/lib/*").toString(),
-                rider.resolve("plugins/textmate-plugin/lib/modules/*").toString());
+        String sdk = String.join(File.pathSeparator, rider.resolve("lib") + File.separator + "*",
+                rider.resolve("plugins/textmate-plugin/lib") + File.separator + "*",
+                rider.resolve("plugins/textmate-plugin/lib/modules") + File.separator + "*");
         Path descriptor = root.resolve("src/main/resources/META-INF/plugin.xml");
         var xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(descriptor.toFile());
         String version = xml.getElementsByTagName("version").item(0).getTextContent();

@@ -43,6 +43,20 @@ navigation; applying the setting restarts the language service.
 Commands execute directly without a shell. Console input/output and process
 termination use Rider's process runner. Debug is deliberately unavailable.
 
+On native Windows x86-64, install the compiler from the Neri checkout with
+PowerShell 7:
+
+```powershell
+pwsh -File scripts/build.ps1 install
+```
+
+The command requires the Visual Studio C++ workload and Windows SDK, and adds
+`%USERPROFILE%\.neri\bin` to the per-user `PATH`. Select
+`%USERPROFILE%\.neri\bin\neri.exe` in Rider if it is not discovered
+automatically, then restart Rider after installation. See Neri's
+[Windows build guide](https://github.com/hakumi-dev/neri/blob/main/docs/WINDOWS.md)
+for the pinned LLVM, GitHub CLI and validation requirements.
+
 The ZIP targets Rider 2026.2.1. Command integration tests accept a Neri
 installation to validate execution against the selected compiler.
 
