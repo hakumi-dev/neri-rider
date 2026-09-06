@@ -10,7 +10,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.nio.file.Path;
 
-/** A language content root, not an inferred compilation/source set. */
+/** A language content root, not an inferred compilation unit. */
 final class NeriProjectSupport {
     private static final Logger LOG = Logger.getInstance(NeriProjectSupport.class);
 

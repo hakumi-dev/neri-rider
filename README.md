@@ -30,7 +30,7 @@ Select **Release optimization** when needed. The toolbar's **Run ▶** executes
 the selected action; it does not implement Rider's global CMake Build action.
 Right-clicking a `.hk` file can create a Run configuration for that file. For
 programs spread across multiple files, use `--project neri.json` in the source
-arguments field, optionally followed by `--source-set <name>`, or list explicit
+arguments field, optionally followed by `--unit <name>`, or list explicit
 sources. The working directory resolves relative paths. Spaces are supported
 in directory names, but `.hk` file names must not contain whitespace.
 Configure the project compiler in **Settings → Languages & Frameworks → Neri**.
@@ -104,14 +104,14 @@ the server through JetBrains' LSP API. Changing the project compiler restarts it
 The compiler is installed separately; this ZIP does not bundle it. A compiler
 without the `lsp` command can still provide syntax highlighting and execution
 actions, but not live diagnostics.
-The server uses `neri.json` at the project root to resolve source sets, including
+The server uses `neri.json` at the project root to resolve compilation units, including
 unsaved dependencies and standard libraries. Without matching source membership,
 documents are analyzed independently. The selected toolchain advertises its
 semantic capabilities, including diagnostics, completion and navigation; the
 compiler's language-server documentation defines their coverage and limitations.
 After replacing the compiler, use **Tools → Neri → Restart Language Server**.
 
-Project source sets can use the patterns supported by the selected compiler.
+Units declare source directories or files and explicit library references.
 Open a common parent folder in Rider when sources and referenced projects must
 all be edited and watched together. The compiler can resolve explicit references
 outside the opened project root, but Rider only forwards closed-file and manifest
@@ -130,7 +130,7 @@ If an opened project source is not in content, it creates a `neri-language` cont
 under `.idea`, excluding `build`, `.bootstrap`, `.git` and `.idea`. Existing
 content roots are not changed. An unrelated root does not skip Neri support.
 This is editor membership, not a compilation
-source set. **Tools → Neri → Language Server Status** reports server and file status.
+unit. **Tools → Neri → Language Server Status** reports server and file status.
 JetBrains' trusted-project guard controls process launch.
 
 If the server runs but diagnostics are absent, use the language-service status

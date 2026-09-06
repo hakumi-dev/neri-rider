@@ -23,7 +23,7 @@ not merely a running server or a nonempty list of content roots.
 Other LSP clients can use the same server, although their presentation and
 supported features may differ. Run, Build and Check invoke the Neri CLI and use
 their execution configuration's sources, arguments and working directory.
-Editor content membership does not define a compilation source set.
+Editor content membership does not define a compilation unit.
 
 ## Validation
 
