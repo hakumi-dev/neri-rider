@@ -6,6 +6,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.platform.lsp.api.LspIntegrationProvider;
 import com.intellij.platform.lsp.api.LspClientDescriptor;
 import com.intellij.platform.lsp.api.LspClientManager;
+import com.intellij.platform.lsp.api.customization.LspCompletionCustomizer;
+import com.intellij.platform.lsp.api.customization.LspCustomization;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 
@@ -47,6 +49,11 @@ public final class NeriLspIntegrationProvider implements LspIntegrationProvider 
     }
 
     private static final class Descriptor extends LspClientDescriptor {
+        private static final LspCustomization CUSTOMIZATION = new LspCustomization() {
+            @Override public LspCompletionCustomizer getCompletionCustomizer() {
+                return NeriCompletionSupport.INSTANCE;
+            }
+        };
         private final Project project;
         private final VirtualFile root;
 
@@ -68,6 +75,14 @@ public final class NeriLspIntegrationProvider implements LspIntegrationProvider 
             GeneralCommandLine command = new GeneralCommandLine(NeriToolchain.compiler(project), "lsp");
             if (project.getBasePath() != null) command.withWorkDirectory(project.getBasePath());
             return command;
+        }
+
+        @Override public LspCustomization getLspCustomization() {
+            return CUSTOMIZATION;
+        }
+
+        @Override public Object createInitializationOptions() {
+            return java.util.Map.of("documentation", NeriToolchain.documentation(project));
         }
     }
 }

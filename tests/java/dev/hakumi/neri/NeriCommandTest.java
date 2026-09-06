@@ -21,7 +21,7 @@ public final class NeriCommandTest {
 
     public static void main(String[] args) throws Exception {
         Path directory = Files.createTempDirectory(Path.of(args[1]), "neri runner ");
-        Path source = directory.resolve("hello world.hk");
+        Path source = directory.resolve("hello_world.hk");
         Files.writeString(source, "use console\nuse host\ndef main(): Void\n  let value = host.argumentAt(0)\n  if value != null\n    console.println(value)\n  end\nend\n");
         String quoted = "\"" + source + "\"";
         String run = execute(NeriCommand.arguments(args[0], "run", quoted, false, "", "\"hello world\""), directory, 0);

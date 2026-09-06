@@ -23,6 +23,16 @@ public final class NeriLspScopeTest {
                 || NeriLspIntegrationProvider.supports(root, new File("main.c", root))) {
             throw new AssertionError("LSP must include project Neri sources, not generated or unrelated files");
         }
+        if (!NeriProjectFilesListener.relevant("/project", "/project/neri.json", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/modules/library/neri.json", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/src/new.hk", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/src/new", true)
+                || NeriProjectFilesListener.relevant("/project", "/project/build/new.hk", false)
+                || NeriProjectFilesListener.relevant("/project", "/project/src/build/new.hk", false)
+                || NeriProjectFilesListener.relevant("/project", "/project-other/main.hk", false)
+                || NeriProjectFilesListener.relevant("/project", "/project/README.md", false)) {
+            throw new AssertionError("Project refresh must include source membership changes without generated-file feedback");
+        }
         System.out.println("Neri LSP root and generated-file boundaries passed.");
     }
 }

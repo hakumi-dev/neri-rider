@@ -41,12 +41,6 @@ public final class NeriLanguageServiceAction extends AnAction {
             if ("hk".equals(file.getExtension())) status.append("\n").append(describe(project, file));
         }
         LOG.info(status.toString());
-        if (Messages.showYesNoDialog(project, status + "\n\nRestart the Neri language service?",
-                "Neri Language Service", Messages.getInformationIcon()) == Messages.YES) {
-            manager.stopClients(NeriLspIntegrationProvider.class);
-            for (VirtualFile file : FileEditorManager.getInstance(project).getOpenFiles()) {
-                NeriLspIntegrationProvider.ensureStarted(project, file);
-            }
-        }
+        Messages.showInfoMessage(project, status.toString(), "Neri Language Server Status");
     }
 }

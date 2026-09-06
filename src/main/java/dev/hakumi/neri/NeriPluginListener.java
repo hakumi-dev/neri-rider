@@ -10,4 +10,11 @@ public final class NeriPluginListener implements DynamicPluginListener {
             NeriHighlighting.reload(null);
         }
     }
+
+    @Override
+    public void beforePluginUnload(IdeaPluginDescriptor descriptor, boolean isUpdate) {
+        if (descriptor.getPluginId().getIdString().equals("dev.hakumi.neri")) {
+            NeriNavigationSupport.uninstall();
+        }
+    }
 }

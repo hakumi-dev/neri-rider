@@ -63,8 +63,8 @@ class Build {
             files(root.resolve("src/main/java"), ".java").forEach(p -> compile.add(p.toString()));
             run(compile);
             String cp = classes + File.pathSeparator + sdk;
-            for (String test : args.length == 2 ? List.of("NeriFileTypeTest", "NeriLspScopeTest", "NeriCommandTest")
-                    : List.of("NeriFileTypeTest", "NeriLspScopeTest")) {
+            for (String test : args.length == 2 ? List.of("NeriFileTypeTest", "NeriLspScopeTest", "NeriCompletionSupportTest", "NeriNavigationSupportTest", "NeriCommandTest")
+                    : List.of("NeriFileTypeTest", "NeriLspScopeTest", "NeriCompletionSupportTest", "NeriNavigationSupportTest")) {
                 run(List.of(javac, "--release", "25", "-proc:none", "-classpath", cp, "-d", classes.toString(),
                         root.resolve("tests/java/dev/hakumi/neri/" + test + ".java").toString()));
                 var command = new ArrayList<>(List.of(java, "-classpath", cp, "dev.hakumi.neri." + test));

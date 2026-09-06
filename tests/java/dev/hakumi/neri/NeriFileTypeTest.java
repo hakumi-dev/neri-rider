@@ -9,6 +9,19 @@ public final class NeriFileTypeTest {
         var descriptor = DocumentBuilderFactory.newInstance().newDocumentBuilder()
             .parse(Path.of(args[0]).toFile());
         var registrations = descriptor.getElementsByTagName("fileType");
+        var groups = descriptor.getElementsByTagName("group");
+        org.w3c.dom.Element menu = null;
+        for (int i = 0; i < groups.getLength(); i++) {
+            var group = (org.w3c.dom.Element) groups.item(i);
+            if (group.getAttribute("id").equals("Neri.Tools")) menu = group;
+        }
+        if (menu == null || !menu.getAttribute("popup").equals("true"))
+            throw new AssertionError("Neri tools must share one submenu");
+        var actions = descriptor.getElementsByTagName("action");
+        for (int i = 0; i < actions.getLength(); i++) {
+            if (actions.item(i).getParentNode() != menu)
+                throw new AssertionError("Neri actions must belong to the Neri submenu");
+        }
         for (int i = 0; i < registrations.getLength(); i++) {
             var registration = (org.w3c.dom.Element) registrations.item(i);
             if (!registration.getAttribute("name").equals("Neri")) continue;

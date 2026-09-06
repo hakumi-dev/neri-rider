@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>dev.hakumi.neri</id>
   <name>Neri</name>
-  <version>0.3.2</version>
+  <version>0.3.5-dev</version>
   <vendor>Hakumi</vendor>
   <description><![CDATA[
     Syntax highlighting for Neri source files (.hk), including typed declarations,
@@ -9,7 +9,8 @@
     and bracket pairing through the bundled Neri grammar. Includes native Rider
     Run, Build and Check configurations invoking the installed Neri compiler.
     Live diagnostics use the compiler's editor-independent language server via
-    neri lsp. Requires a compatible compiler; completion is not yet implemented.
+    neri lsp. Completion, hover, navigation and references are provided by a
+    compatible Neri language server.
   ]]></description>
   <idea-version since-build="262" until-build="262.*"/>
   <depends>com.intellij.modules.lang</depends>
@@ -29,6 +30,7 @@
     <textmate.bundleProvider implementation="dev.hakumi.neri.NeriBundleProvider"/>
   </extensions>
   <applicationListeners>
+    <listener class="dev.hakumi.neri.NeriProjectFilesListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
     <listener class="dev.hakumi.neri.NeriPluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
   </applicationListeners>
   <projectListeners>
@@ -36,13 +38,15 @@
               topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
   </projectListeners>
   <actions>
-    <action id="Neri.LanguageService" class="dev.hakumi.neri.NeriLanguageServiceAction"
-            text="Neri Language Service" description="Show language server status and restart it">
+    <group id="Neri.Tools" text="Neri" popup="true">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
-    <action id="Neri.ReloadHighlighting" class="dev.hakumi.neri.ReloadNeriHighlightingAction"
-            text="Reload Neri Highlighting" description="Reload the Neri grammar and refresh file recognition">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
+      <action id="Neri.RestartLanguageServer" class="dev.hakumi.neri.NeriRestartLanguageServerAction"
+              text="Restart Language Server" description="Restart the project's Neri language server"/>
+      <action id="Neri.LanguageService" class="dev.hakumi.neri.NeriLanguageServiceAction"
+              text="Language Server Status" description="Show the Neri language server and source-file status"/>
+      <separator/>
+      <action id="Neri.ReloadHighlighting" class="dev.hakumi.neri.ReloadNeriHighlightingAction"
+              text="Reload Highlighting" description="Reload the Neri grammar and refresh file recognition"/>
+    </group>
   </actions>
 </idea-plugin>

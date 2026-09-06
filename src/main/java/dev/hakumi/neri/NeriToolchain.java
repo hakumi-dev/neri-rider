@@ -7,6 +7,11 @@ import java.nio.file.Path;
 
 final class NeriToolchain {
     static final String KEY = "neri.compiler";
+    static final String DOCUMENTATION_KEY = "neri.documentation";
+
+    static boolean documentation(Project project) {
+        return PropertiesComponent.getInstance(project).getBoolean(DOCUMENTATION_KEY, true);
+    }
 
     static String compiler(Project project) {
         String configured = PropertiesComponent.getInstance(project).getValue(KEY);

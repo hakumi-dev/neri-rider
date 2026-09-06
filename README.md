@@ -13,7 +13,8 @@ brackets, and double quotes have editor pairing rules.
 The plugin uses Rider's TextMate Bundles support and does not require a Neri
 compiler for highlighting. Execution configurations require an installed Neri
 compiler. Live diagnostics use the compiler's editor-independent language server.
-Semantic completion and a debugger are not implemented. The server belongs with the Neri compiler;
+Semantic features are supplied by the selected compiler's language server;
+the plugin does not implement a separate type system or debugger. The server belongs with the Neri compiler;
 see [the integration boundary](docs/LANGUAGE-SERVER.md).
 
 ## Run, build and check
@@ -28,11 +29,17 @@ source files (quote paths containing spaces), working directory and action:
 Select **Release optimization** when needed. The toolbar's **Run ▶** executes
 the selected action; it does not implement Rider's global CMake Build action.
 Right-clicking a `.hk` file can create a Run configuration for that file. For
-programs spread across multiple files, list all sources in the configuration.
+programs spread across multiple files, use `--project neri.json` in the source
+arguments field, optionally followed by `--source-set <name>`, or list explicit
+sources. The working directory resolves relative paths. Spaces are supported
+in directory names, but `.hk` file names must not contain whitespace.
 Configure the project compiler in **Settings → Languages & Frameworks → Neri**.
 The default is `~/.neri/bin/neri` when present, otherwise `neri` from PATH.
 This setting controls the language server and new execution configurations;
 existing Run configurations retain their explicitly selected compiler.
+**Show symbol documentation** controls explanatory text in hover and completion
+for compatible language servers. Disabling it preserves types, signatures and
+navigation; applying the setting restarts the language service.
 Commands execute directly without a shell. Console input/output and process
 termination use Rider's process runner. Debug is deliberately unavailable.
 
@@ -48,10 +55,10 @@ semantic language support.
 
 1. Enable **TextMate Bundles** in **Settings → Plugins → Installed**.
 2. Open **Settings → Plugins → gear menu → Install Plugin from Disk**.
-3. Select `neri-0.3.2.zip` and accept the installation.
+3. Select `neri-0.3.5-dev.zip` and accept the installation.
 4. Open a `.hk` source file.
 
-The plugin refreshes TextMate after dynamic installation. **Tools → Reload Neri
+The plugin refreshes TextMate after dynamic installation. **Tools → Neri → Reload
 Highlighting** reloads the grammar and reports registration status in the status
 bar and `idea.log`. Use this action if an existing editor remains unhighlighted.
 If Rider requests a restart while updating plugins, follow that prompt.
@@ -78,7 +85,7 @@ npm test
 ```
 
 On macOS, pass the application's `Contents` directory. The build uses the local
-Rider SDK and writes `build/neri-0.3.2.zip` with a SHA-256 sidecar. Rider's binaries
+Rider SDK and writes `build/neri-<version>.zip` with a SHA-256 sidecar. Rider's binaries
 are not redistributed in the plugin.
 
 Grammar tests exercise token scopes, Unicode names, escaped strings, comment
@@ -97,17 +104,33 @@ the server through JetBrains' LSP API. Changing the project compiler restarts it
 The compiler is installed separately; this ZIP does not bundle it. A compiler
 without the `lsp` command can still provide syntax highlighting and execution
 actions, but not live diagnostics.
-The server analyzes each document independently, including unsaved text,
-and loads its standard library. Cross-file user declarations, completion and
-navigation are unsupported. The compiler's language-server documentation defines
-the supported protocol capabilities.
+The server uses `neri.json` at the project root to resolve source sets, including
+unsaved dependencies and standard libraries. Without matching source membership,
+documents are analyzed independently. The selected toolchain advertises its
+semantic capabilities, including diagnostics, completion and navigation; the
+compiler's language-server documentation defines their coverage and limitations.
+After replacing the compiler, use **Tools → Neri → Restart Language Server**.
+
+Project source sets can use the patterns supported by the selected compiler.
+Open a common parent folder in Rider when sources and referenced projects must
+all be edited and watched together. The compiler can resolve explicit references
+outside the opened project root, but Rider only forwards closed-file and manifest
+changes detected below that root; it does not add a global watcher for external
+references. The client forwards source and manifest creation, edits, moves and
+deletion within the opened project. Generated output directories are excluded
+from these notifications.
+
+Declaration navigation uses the active keymap's mouse shortcut (Ctrl+click in
+the default Linux keymap) and the same compiler-backed action as **Go to
+Declaration**. The shortcut is limited to project Neri sources. Ctrl+hover
+underlining is not provided by this integration.
 
 The plugin handles `.hk` editor events independently of CMake initialization.
 If an opened project source is not in content, it creates a `neri-language` content module
 under `.idea`, excluding `build`, `.bootstrap`, `.git` and `.idea`. Existing
 content roots are not changed. An unrelated root does not skip Neri support.
 This is editor membership, not a compilation
-source set. **Tools → Neri Language Service** reports state and offers restart.
+source set. **Tools → Neri → Language Server Status** reports server and file status.
 JetBrains' trusted-project guard controls process launch.
 
 If the server runs but diagnostics are absent, use the language-service status
