@@ -1,0 +1,28 @@
+{
+  "name": "neri",
+  "displayName": "Neri",
+  "version": "0.3.2",
+  "description": "Neri source highlighting and editor conventions.",
+  "contributes": {
+    "languages": [
+      {
+        "id": "neri",
+        "extensions": [
+          ".hk"
+        ],
+        "aliases": [
+          "Neri",
+          "neri"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "neri",
+        "scopeName": "source.neri",
+        "path": "./syntaxes/neri.tmLanguage.json"
+      }
+    ]
+  }
+}

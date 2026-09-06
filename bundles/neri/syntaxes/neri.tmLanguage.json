@@ -1,0 +1,442 @@
+{
+  "name": "Neri",
+  "scopeName": "source.neri",
+  "fileTypes": [
+    "hk"
+  ],
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "include": "#annotation"
+    },
+    {
+      "include": "#class"
+    },
+    {
+      "include": "#function"
+    },
+    {
+      "include": "#closure"
+    },
+    {
+      "include": "#do-parameters"
+    },
+    {
+      "include": "#local-annotation"
+    },
+    {
+      "include": "#field-annotation"
+    },
+    {
+      "include": "#constructed-type"
+    },
+    {
+      "include": "#literal"
+    },
+    {
+      "include": "#builtin-type"
+    },
+    {
+      "include": "#keyword"
+    },
+    {
+      "include": "#number"
+    },
+    {
+      "include": "#call"
+    },
+    {
+      "include": "#group"
+    },
+    {
+      "include": "#operator"
+    },
+    {
+      "include": "#brackets"
+    },
+    {
+      "include": "#separator"
+    },
+    {
+      "include": "#identifier"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.number-sign.neri",
+      "begin": "#",
+      "end": "$"
+    },
+    "string": {
+      "name": "string.quoted.double.neri",
+      "begin": "\"",
+      "end": "\"|(?=$)",
+      "patterns": [
+        {
+          "name": "constant.character.escape.neri",
+          "match": "\\\\[\"\\\\0ntr]"
+        }
+      ]
+    },
+    "annotation": {
+      "match": "(?<![\\p{L}\\p{Nd}_])(@)([\\p{L}_][\\p{L}\\p{Nd}_]*)",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.annotation.neri"
+        },
+        "2": {
+          "name": "entity.name.function.annotation.neri"
+        }
+      }
+    },
+    "literal": {
+      "name": "constant.language.neri",
+      "match": "(?<![\\p{L}\\p{Nd}_])(?:true|false|null)(?![\\p{L}\\p{Nd}_])"
+    },
+    "builtin-type": {
+      "name": "storage.type.neri",
+      "match": "(?<![\\p{L}\\p{Nd}_])(?:Int|Float|Byte|Bool|String|Void|Int32|UInt32|UInt64|Float32)(?![\\p{L}\\p{Nd}_])"
+    },
+    "keyword": {
+      "name": "keyword.control.neri",
+      "match": "(?<![\\p{L}\\p{Nd}_])(?:as|borrow|break|class|continue|def|do|else|end|for|fn|if|in|internal|let|namespace|native|new|private|protected|public|readonly|return|stackalloc|static|struct|super|this|union|unsafe|use|var|while)(?![\\p{L}\\p{Nd}_])"
+    },
+    "number": {
+      "name": "constant.numeric.neri",
+      "match": "(?<![\\p{L}\\p{Nd}_])\\p{Nd}+(?:\\.\\p{Nd}+)?"
+    },
+    "operator": {
+      "name": "keyword.operator.neri",
+      "match": "==|!=|<=|>=|&&|\\|\\||[+*/=<>!&?\\-]"
+    },
+    "brackets": {
+      "name": "punctuation.section.brackets.neri",
+      "match": "[\\[\\]()]"
+    },
+    "separator": {
+      "name": "punctuation.separator.neri",
+      "match": "[:,.]"
+    },
+    "identifier": {
+      "name": "variable.other.neri",
+      "match": "[\\p{L}_][\\p{L}\\p{Nd}_]*"
+    },
+    "type": {
+      "patterns": [
+        {
+          "include": "#builtin-type"
+        },
+        {
+          "match": "(?<![\\p{L}\\p{Nd}_])fn(?![\\p{L}\\p{Nd}_])",
+          "name": "keyword.control.neri"
+        },
+        {
+          "include": "#type-arguments"
+        },
+        {
+          "begin": "\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.neri"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.neri"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        },
+        {
+          "match": "[\\p{L}_][\\p{L}\\p{Nd}_]*",
+          "name": "entity.name.type.class.neri"
+        },
+        {
+          "include": "#operator"
+        },
+        {
+          "include": "#separator"
+        },
+        {
+          "include": "#brackets"
+        }
+      ]
+    },
+    "type-arguments": {
+      "begin": "<",
+      "end": ">",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.typeparameters.begin.neri"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.typeparameters.end.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type"
+        }
+      ]
+    },
+    "parameter-annotation": {
+      "begin": "([\\p{L}_][\\p{L}\\p{Nd}_]*)\\s*(:)",
+      "end": "(?=[=,)#\\r\\n])",
+      "beginCaptures": {
+        "1": {
+          "name": "variable.parameter.function.neri"
+        },
+        "2": {
+          "name": "punctuation.separator.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type"
+        }
+      ]
+    },
+    "do-parameters": {
+      "begin": "(?<![\\p{L}\\p{Nd}_])(do)[ \\t]+(\\|)",
+      "end": "\\||$",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.neri" },
+        "2": { "name": "punctuation.section.brackets.neri" }
+      },
+      "endCaptures": { "0": { "name": "punctuation.section.brackets.neri" } },
+      "patterns": [
+        {
+          "begin": ":",
+          "end": "(?=[,|])",
+          "patterns": [{ "include": "#type" }]
+        },
+        { "match": "[\\p{L}_][\\p{L}\\p{Nd}_]*", "name": "variable.parameter.function.neri" },
+        { "include": "#separator" }
+      ]
+    },
+    "parameters": {
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.neri"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#parameter-annotation"
+        },
+        {
+          "begin": "=",
+          "end": "(?=[,)])",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.operator.neri"
+            }
+          },
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "match": "[\\p{L}_][\\p{L}\\p{Nd}_]*",
+          "name": "variable.parameter.function.neri"
+        },
+        {
+          "include": "#separator"
+        }
+      ]
+    },
+    "return-type": {
+      "begin": ":",
+      "end": "(?=[#\\r\\n])",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.separator.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type"
+        }
+      ]
+    },
+    "function": {
+      "begin": "(?<![\\p{L}\\p{Nd}_])(def)\\b[ \\t]+((?:(?:static|unsafe)[ \\t]+)*)([\\p{L}_][\\p{L}\\p{Nd}_]*)",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.declaration.function.neri"
+        },
+        "2": {
+          "name": "storage.modifier.neri"
+        },
+        "3": {
+          "name": "entity.name.function.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type-arguments"
+        },
+        {
+          "include": "#parameters"
+        },
+        {
+          "include": "#return-type"
+        },
+        {
+          "include": "#comment"
+        }
+      ]
+    },
+    "closure": {
+      "begin": "(?<![\\p{L}\\p{Nd}_])(fn)(?![\\p{L}\\p{Nd}_])(?=[ \\t]*\\()",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#parameters"
+        },
+        {
+          "include": "#return-type"
+        },
+        {
+          "include": "#comment"
+        }
+      ]
+    },
+    "class": {
+      "begin": "(?<![\\p{L}\\p{Nd}_])(class|struct|union)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*)",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.declaration.type.neri"
+        },
+        "2": {
+          "name": "entity.name.type.class.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type-arguments"
+        },
+        {
+          "include": "#return-type"
+        },
+        {
+          "include": "#comment"
+        }
+      ]
+    },
+    "local-annotation": {
+      "begin": "(?<![\\p{L}\\p{Nd}_])(let|var)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*)[ \\t]*(:)",
+      "end": "(?=[=#\\r\\n])",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.neri"
+        },
+        "2": {
+          "name": "variable.other.neri"
+        },
+        "3": {
+          "name": "punctuation.separator.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type"
+        }
+      ]
+    },
+    "field-annotation": {
+      "begin": "^[ \\t]*(?:(public|private|protected|internal)[ \\t]+)?([\\p{L}_][\\p{L}\\p{Nd}_]*)[ \\t]*(:)",
+      "end": "(?=[=#\\r\\n])",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.modifier.neri"
+        },
+        "2": {
+          "name": "variable.other.member.neri"
+        },
+        "3": {
+          "name": "punctuation.separator.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type"
+        }
+      ]
+    },
+    "constructed-type": {
+      "begin": "(?<![\\p{L}\\p{Nd}_])(new|as|stackalloc)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*(?:\\.[\\p{L}_][\\p{L}\\p{Nd}_]*)*)",
+      "end": "(?![ \\t]*<)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.neri"
+        },
+        "2": {
+          "name": "entity.name.type.class.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#type-arguments"
+        }
+      ]
+    },
+    "call": {
+      "match": "(?<![\\p{L}\\p{Nd}_])[\\p{L}_][\\p{L}\\p{Nd}_]*(?=[ \\t]*\\()",
+      "name": "support.function.neri"
+    },
+    "group": {
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.neri"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.neri"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    }
+  }
+}

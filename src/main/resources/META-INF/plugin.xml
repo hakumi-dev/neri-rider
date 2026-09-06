@@ -1,0 +1,48 @@
+<idea-plugin>
+  <id>dev.hakumi.neri</id>
+  <name>Neri</name>
+  <version>0.3.2</version>
+  <vendor>Hakumi</vendor>
+  <description><![CDATA[
+    Syntax highlighting for Neri source files (.hk), including typed declarations,
+    closures, strings, comments, and native operations. Provides line comments
+    and bracket pairing through the bundled Neri grammar. Includes native Rider
+    Run, Build and Check configurations invoking the installed Neri compiler.
+    Live diagnostics use the compiler's editor-independent language server via
+    neri lsp. Requires a compatible compiler; completion is not yet implemented.
+  ]]></description>
+  <idea-version since-build="262" until-build="262.*"/>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>org.jetbrains.plugins.textmate</depends>
+  <depends>com.intellij.modules.lsp</depends>
+  <depends>com.intellij.modules.ultimate</depends>
+  <extensions defaultExtensionNs="com.intellij">
+    <platform.lsp.integrationProvider implementation="dev.hakumi.neri.NeriLspIntegrationProvider"/>
+    <projectConfigurable parentId="language" id="neri.toolchain" displayName="Neri"
+                         instance="dev.hakumi.neri.NeriToolchainConfigurable"/>
+    <configurationType implementation="dev.hakumi.neri.NeriConfigurationType"/>
+    <runConfigurationProducer implementation="dev.hakumi.neri.NeriConfigurationProducer"/>
+    <fileType name="Neri" implementationClass="dev.hakumi.neri.NeriFileType"
+              fieldName="INSTANCE" extensions="hk"/>
+    <editorHighlighterProvider filetype="Neri"
+              implementationClass="org.jetbrains.plugins.textmate.language.syntax.highlighting.TextMateEditorHighlighterProvider"/>
+    <textmate.bundleProvider implementation="dev.hakumi.neri.NeriBundleProvider"/>
+  </extensions>
+  <applicationListeners>
+    <listener class="dev.hakumi.neri.NeriPluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+  </applicationListeners>
+  <projectListeners>
+    <listener class="dev.hakumi.neri.NeriEditorListener"
+              topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+  </projectListeners>
+  <actions>
+    <action id="Neri.LanguageService" class="dev.hakumi.neri.NeriLanguageServiceAction"
+            text="Neri Language Service" description="Show language server status and restart it">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+    <action id="Neri.ReloadHighlighting" class="dev.hakumi.neri.ReloadNeriHighlightingAction"
+            text="Reload Neri Highlighting" description="Reload the Neri grammar and refresh file recognition">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+  </actions>
+</idea-plugin>
