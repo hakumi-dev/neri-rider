@@ -49,7 +49,9 @@ class Build {
         String java = javaHome.resolve("bin/java").toString();
         String sdk = String.join(File.pathSeparator, rider.resolve("lib") + File.separator + "*",
                 rider.resolve("plugins/textmate-plugin/lib") + File.separator + "*",
-                rider.resolve("plugins/textmate-plugin/lib/modules") + File.separator + "*");
+                rider.resolve("plugins/textmate-plugin/lib/modules") + File.separator + "*",
+                rider.resolve("plugins/editorconfig-plugin/lib") + File.separator + "*",
+                rider.resolve("plugins/editorconfig-plugin/lib/modules") + File.separator + "*");
         Path descriptor = root.resolve("src/main/resources/META-INF/plugin.xml");
         var xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(descriptor.toFile());
         String version = xml.getElementsByTagName("version").item(0).getTextContent();
@@ -62,9 +64,10 @@ class Build {
                     "-classpath", sdk, "-d", classes.toString()));
             files(root.resolve("src/main/java"), ".java").forEach(p -> compile.add(p.toString()));
             run(compile);
-            String cp = classes + File.pathSeparator + sdk;
-            for (String test : args.length == 2 ? List.of("NeriFileTypeTest", "NeriLspScopeTest", "NeriCompletionSupportTest", "NeriNavigationSupportTest", "NeriCommandTest")
-                    : List.of("NeriFileTypeTest", "NeriLspScopeTest", "NeriCompletionSupportTest", "NeriNavigationSupportTest")) {
+            String cp = classes + File.pathSeparator + root.resolve("src/main/resources") + File.pathSeparator + sdk;
+            for (Path testSource : files(root.resolve("tests/java/dev/hakumi/neri"), "Test.java")) {
+                String test = testSource.getFileName().toString().replaceFirst("\\.java$", "");
+                if (test.equals("NeriCommandTest") && args.length != 2) continue;
                 run(List.of(javac, "--release", "25", "-proc:none", "-classpath", cp, "-d", classes.toString(),
                         root.resolve("tests/java/dev/hakumi/neri/" + test + ".java").toString()));
                 var command = new ArrayList<>(List.of(java, "-classpath", cp, "dev.hakumi.neri." + test));
@@ -78,6 +81,8 @@ class Build {
                     jar.put(classes.relativize(file).toString().replace(File.separatorChar, '/'), Files.readAllBytes(file));
             }
             jar.put("META-INF/plugin.xml", Files.readAllBytes(descriptor));
+            jar.put("META-INF/neri-editorconfig.xml", Files.readAllBytes(root.resolve("src/main/resources/META-INF/neri-editorconfig.xml")));
+            jar.put("schemas/neri-editorconfig.json", Files.readAllBytes(root.resolve("src/main/resources/schemas/neri-editorconfig.json")));
             Map<String, byte[]> zip = new TreeMap<>();
             zip.put("neri/lib/neri.jar", archive(jar));
             for (Path file : files(root.resolve("bundles/neri"), "")) {

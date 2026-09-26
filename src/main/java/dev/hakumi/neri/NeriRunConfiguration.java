@@ -1,9 +1,11 @@
 package dev.hakumi.neri;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.filters.RegexpFilter;
 import com.intellij.execution.process.KillableColoredProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
@@ -16,6 +18,12 @@ import org.jdom.Element;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import com.intellij.execution.process.NopProcessHandler;
+import com.intellij.execution.process.CapturingProcessHandler;
 
 public final class NeriRunConfiguration extends RunConfigurationBase<RunConfigurationOptions> {
     public String compiler;
@@ -25,6 +33,7 @@ public final class NeriRunConfiguration extends RunConfigurationBase<RunConfigur
     public String arguments = "";
     public String output = "";
     public boolean release;
+    public String debugAdapter = "";
 
     public NeriRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory, name);
@@ -68,6 +77,9 @@ public final class NeriRunConfiguration extends RunConfigurationBase<RunConfigur
     }
 
     @Override public RunProfileState getState(Executor executor, ExecutionEnvironment environment) {
+        if (DefaultDebugExecutor.EXECUTOR_ID.equals(executor.getId()) && mode.equals("run")) {
+            return (ignoredExecutor, runner) -> new DefaultExecutionResult(new NopProcessHandler());
+        }
         if (!DefaultRunExecutor.EXECUTOR_ID.equals(executor.getId())) return null;
         return new CommandLineState(environment) {
             {
@@ -88,6 +100,7 @@ public final class NeriRunConfiguration extends RunConfigurationBase<RunConfigur
         arguments = element.getAttributeValue("arguments", arguments);
         output = element.getAttributeValue("output", output);
         release = Boolean.parseBoolean(element.getAttributeValue("release", "false"));
+        debugAdapter = element.getAttributeValue("debugAdapter", "");
     }
 
     @Override public void writeExternal(Element element) throws com.intellij.openapi.util.WriteExternalException {
@@ -99,5 +112,54 @@ public final class NeriRunConfiguration extends RunConfigurationBase<RunConfigur
         element.setAttribute("arguments", arguments);
         element.setAttribute("output", output);
         element.setAttribute("release", Boolean.toString(release));
+        element.setAttribute("debugAdapter", debugAdapter);
+    }
+
+    Path debugExecutable() {
+        try {
+            String identity = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                .digest(getName().getBytes(StandardCharsets.UTF_8)), 0, 12);
+            String suffix = com.intellij.openapi.util.SystemInfo.isWindows ? ".exe" : "";
+            return Path.of(workingDirectory).resolve(".neri/debug/config-" + identity + suffix).toAbsolutePath();
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new AssertionError(impossible);
+        }
+    }
+
+    GeneralCommandLine debugBuildCommandLine() throws ExecutionException {
+        try { Files.createDirectories(debugExecutable().getParent()); }
+        catch (java.io.IOException exception) { throw new ExecutionException("Cannot create Neri debug output directory.", exception); }
+        return new GeneralCommandLine(NeriCommand.arguments(compiler, "build", sources, false,
+            debugExecutable().toString(), "")).withWorkDirectory(workingDirectory);
+    }
+
+    String resolvedDebugAdapter() throws ExecutionException {
+        if (!debugAdapter.isBlank()) return resolveDebugAdapter(debugAdapter);
+        var fromPath = com.intellij.execution.configurations.PathEnvironmentVariableUtil.findInPath("lldb-dap");
+        if (fromPath != null) return fromPath.getAbsolutePath();
+        try {
+            var output = new CapturingProcessHandler(new GeneralCommandLine("xcrun", "-f", "lldb-dap")).runProcess(10_000);
+            if (!output.isTimeout() && output.getExitCode() == 0 && !output.getStdout().isBlank()) return output.getStdout().trim();
+        } catch (ExecutionException ignored) { }
+        throw new ExecutionException("Cannot find lldb-dap. Set its executable in the Neri Run configuration.");
+    }
+
+    static String resolveDebugAdapter(String configured) throws ExecutionException {
+        String candidate = configured.trim();
+        if (candidate.startsWith("~/") || candidate.startsWith("~\\")) {
+            candidate = Path.of(System.getProperty("user.home"), candidate.substring(2)).toString();
+        }
+        boolean path = Path.of(candidate).isAbsolute() || candidate.contains("/") || candidate.contains("\\");
+        if (!path) {
+            var resolved = com.intellij.execution.configurations.PathEnvironmentVariableUtil.findInPath(candidate);
+            if (resolved != null) return resolved.getAbsolutePath();
+        } else {
+            var resolved = Path.of(candidate).toAbsolutePath().normalize();
+            if (Files.isRegularFile(resolved)
+                    && (com.intellij.openapi.util.SystemInfo.isWindows || Files.isExecutable(resolved))) {
+                return resolved.toString();
+            }
+        }
+        throw new ExecutionException("LLDB DAP executable does not exist or is not executable: " + candidate);
     }
 }

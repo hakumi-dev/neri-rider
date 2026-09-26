@@ -12,6 +12,7 @@ public final class NeriSettingsEditor extends SettingsEditor<NeriRunConfiguratio
     private final JTextField arguments = new JTextField();
     private final JTextField output = new JTextField();
     private final JCheckBox release = new JCheckBox("Release optimization");
+    private final JTextField debugAdapter = new JTextField();
     private final JPanel panel = FormBuilder.createFormBuilder()
         .addLabeledComponent("Neri executable:", compiler)
         .addLabeledComponent("Source files (quote paths with spaces):", sources)
@@ -19,6 +20,7 @@ public final class NeriSettingsEditor extends SettingsEditor<NeriRunConfiguratio
         .addLabeledComponent("Action:", mode)
         .addLabeledComponent("Program arguments (Run):", arguments)
         .addLabeledComponent("Output executable (Build):", output)
+        .addLabeledComponent("LLDB DAP executable (optional):", debugAdapter)
         .addComponent(release).getPanel();
 
     @Override protected JComponent createEditor() { return panel; }
@@ -30,6 +32,7 @@ public final class NeriSettingsEditor extends SettingsEditor<NeriRunConfiguratio
         arguments.setText(config.arguments);
         output.setText(config.output);
         release.setSelected(config.release);
+        debugAdapter.setText(config.debugAdapter);
     }
     @Override protected void applyEditorTo(NeriRunConfiguration config) {
         config.compiler = compiler.getText().trim();
@@ -39,5 +42,6 @@ public final class NeriSettingsEditor extends SettingsEditor<NeriRunConfiguratio
         config.arguments = arguments.getText();
         config.output = output.getText().trim();
         config.release = release.isSelected();
+        config.debugAdapter = debugAdapter.getText().trim();
     }
 }

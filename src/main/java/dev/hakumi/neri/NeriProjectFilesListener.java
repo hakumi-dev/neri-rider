@@ -28,7 +28,9 @@ public final class NeriProjectFilesListener implements BulkFileListener {
                     || component.equals("out") || component.equals("dist")
                     || component.equals("target") || component.equals("bin")) return false;
         }
-        return directory || relative.equals("neri.json") || relative.endsWith("/neri.json")
+        return directory || relative.equals("manifest.json") || relative.endsWith("/manifest.json")
+                || relative.equals(".editorconfig") || relative.endsWith("/.editorconfig")
+                || relative.equals("neri.json") || relative.endsWith("/neri.json")
                 || relative.endsWith(".hk");
     }
 

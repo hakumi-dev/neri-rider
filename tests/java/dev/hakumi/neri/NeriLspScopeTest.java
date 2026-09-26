@@ -23,7 +23,11 @@ public final class NeriLspScopeTest {
                 || NeriLspIntegrationProvider.supports(root, new File("main.c", root))) {
             throw new AssertionError("LSP must include project Neri sources, not generated or unrelated files");
         }
-        if (!NeriProjectFilesListener.relevant("/project", "/project/neri.json", false)
+        if (!NeriProjectFilesListener.relevant("/project", "/project/manifest.json", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/modules/library/manifest.json", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/.editorconfig", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/src/.editorconfig", false)
+                || !NeriProjectFilesListener.relevant("/project", "/project/neri.json", false)
                 || !NeriProjectFilesListener.relevant("/project", "/project/modules/library/neri.json", false)
                 || !NeriProjectFilesListener.relevant("/project", "/project/src/new.hk", false)
                 || !NeriProjectFilesListener.relevant("/project", "/project/src/new", true)

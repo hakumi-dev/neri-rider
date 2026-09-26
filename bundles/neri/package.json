@@ -1,7 +1,7 @@
 {
   "name": "neri",
   "displayName": "Neri",
-  "version": "0.3.2",
+  "version": "0.4.3-dev",
   "description": "Neri source highlighting and editor conventions.",
   "contributes": {
     "languages": [

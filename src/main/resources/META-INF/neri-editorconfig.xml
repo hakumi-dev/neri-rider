@@ -1,0 +1,5 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="editorconfig">
+    <optionDescriptorProvider implementation="dev.hakumi.neri.NeriEditorConfigProvider"/>
+  </extensions>
+</idea-plugin>

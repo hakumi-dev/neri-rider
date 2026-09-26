@@ -15,6 +15,12 @@
       "include": "#annotation"
     },
     {
+      "include": "#quotation"
+    },
+    {
+      "include": "#declaration-modifier"
+    },
+    {
       "include": "#class"
     },
     {
@@ -94,6 +100,18 @@
         }
       }
     },
+    "quotation": {
+      "patterns": [
+        {
+          "name": "storage.modifier.neri",
+          "match": "(?<![\\p{L}\\p{Nd}_])quote(?=[ \\t]+fn(?![\\p{L}\\p{Nd}_]))"
+        },
+        {
+          "name": "keyword.control.neri",
+          "match": "(?<![\\p{L}\\p{Nd}_])quote(?=[ \\t]+do(?![\\p{L}\\p{Nd}_]))"
+        }
+      ]
+    },
     "literal": {
       "name": "constant.language.neri",
       "match": "(?<![\\p{L}\\p{Nd}_])(?:true|false|null)(?![\\p{L}\\p{Nd}_])"
@@ -104,7 +122,11 @@
     },
     "keyword": {
       "name": "keyword.control.neri",
-      "match": "(?<![\\p{L}\\p{Nd}_])(?:as|borrow|break|class|continue|def|do|else|end|for|fn|if|in|internal|let|namespace|native|new|private|protected|public|readonly|return|stackalloc|static|struct|super|this|union|unsafe|use|var|while)(?![\\p{L}\\p{Nd}_])"
+      "match": "(?<![\\p{L}\\p{Nd}_])(?:as|borrow|break|case|class|continue|def|do|else|end|enum|for|fn|if|in|internal|let|match|namespace|native|new|private|protected|public|resource|return|stackalloc|static|struct|super|this|transfer|try|union|unsafe|use|using|var|while)(?![\\p{L}\\p{Nd}_])"
+    },
+    "declaration-modifier": {
+      "name": "storage.modifier.neri",
+      "match": "(?<![\\p{L}\\p{Nd}_.])(?:public|protected|internal|private|abstract|sealed|override|static|readonly|unsafe|resource)(?=[ \\t]+(?:[\\p{L}_][\\p{L}\\p{Nd}_]*[ \\t]+)*(?:class|def|enum)(?![\\p{L}\\p{Nd}_]))"
     },
     "number": {
       "name": "constant.numeric.neri",
@@ -120,7 +142,7 @@
     },
     "separator": {
       "name": "punctuation.separator.neri",
-      "match": "[:,.]"
+      "match": "::|[:,.]"
     },
     "identifier": {
       "name": "variable.other.neri",
@@ -128,6 +150,13 @@
     },
     "type": {
       "patterns": [
+        {
+          "match": "(?<![\\p{L}\\p{Nd}_])readonly(?![\\p{L}\\p{Nd}_])",
+          "name": "storage.modifier.neri"
+        },
+        {
+          "include": "#quotation"
+        },
         {
           "include": "#builtin-type"
         },
@@ -137,6 +166,10 @@
         },
         {
           "include": "#type-arguments"
+        },
+        {
+          "match": "[\\p{L}_][\\p{L}\\p{Nd}_]*(?:::[\\p{L}_][\\p{L}\\p{Nd}_]*)+",
+          "name": "entity.name.type.class.neri"
         },
         {
           "begin": "\\(",
@@ -287,16 +320,13 @@
       ]
     },
     "function": {
-      "begin": "(?<![\\p{L}\\p{Nd}_])(def)\\b[ \\t]+((?:(?:static|unsafe)[ \\t]+)*)([\\p{L}_][\\p{L}\\p{Nd}_]*)",
+      "begin": "(?<![\\p{L}\\p{Nd}_])(def)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*)",
       "end": "(?=$)",
       "beginCaptures": {
         "1": {
           "name": "keyword.declaration.function.neri"
         },
         "2": {
-          "name": "storage.modifier.neri"
-        },
-        "3": {
           "name": "entity.name.function.neri"
         }
       },
@@ -336,7 +366,7 @@
       ]
     },
     "class": {
-      "begin": "(?<![\\p{L}\\p{Nd}_])(class|struct|union)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*)",
+      "begin": "(?<![\\p{L}\\p{Nd}_])(class|struct|union|enum|contract)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*)",
       "end": "(?=$)",
       "beginCaptures": {
         "1": {
@@ -399,7 +429,7 @@
       ]
     },
     "constructed-type": {
-      "begin": "(?<![\\p{L}\\p{Nd}_])(new|as|stackalloc)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*(?:\\.[\\p{L}_][\\p{L}\\p{Nd}_]*)*)",
+      "begin": "(?<![\\p{L}\\p{Nd}_])(new|as|stackalloc)\\b[ \\t]+([\\p{L}_][\\p{L}\\p{Nd}_]*(?:(?:\\.|::)[\\p{L}_][\\p{L}\\p{Nd}_]*)*)",
       "end": "(?![ \\t]*<)",
       "beginCaptures": {
         "1": {
@@ -433,6 +463,12 @@
         }
       },
       "patterns": [
+        {
+          "match": "(?<=[(,])[ \\t]*([\\p{L}_][\\p{L}\\p{Nd}_]*)(?=[ \\t]*:)",
+          "captures": {
+            "1": { "name": "variable.parameter.function.neri" }
+          }
+        },
         {
           "include": "$self"
         }

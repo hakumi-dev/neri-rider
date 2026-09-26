@@ -1,0 +1,47 @@
+[
+  {
+    "type": "option",
+    "key": "neri_blank_line_after_declarations",
+    "documentation": "Separate sibling let/var declarations from the following statement with a blank line.",
+    "value": { "type": "union", "values": ["true", "false", "unset"] }
+  },
+  {
+    "type": "option",
+    "key": "neri_blank_line_before_assertions",
+    "documentation": "Separate an assertion group from a preceding non-assertion statement with a blank line.",
+    "value": { "type": "union", "values": ["true", "false", "unset"] }
+  },
+  {
+    "type": "option",
+    "key": "neri_indentation",
+    "documentation": "Indent block bodies and delimiter continuations using the parser and the standard indentation settings.",
+    "value": { "type": "union", "values": ["true", "false", "unset"] }
+  },
+  {
+    "type": "option",
+    "key": "neri_token_spacing",
+    "documentation": "Normalize horizontal spacing around punctuation and syntax-resolved operators.",
+    "value": { "type": "union", "values": ["true", "false", "unset"] }
+  },
+  {
+    "type": "option",
+    "key": {
+      "type": "qualified",
+      "values": ["neri_diagnostic", { "type": "declaration", "id": "neri_rule", "needs_references": false, "required": true }, "severity"]
+    },
+    "documentation": "Control a Neri rule's diagnostic severity. Formatting preferences remain active at severity none.",
+    "value": { "type": "union", "values": ["none", "suggestion", "warning", "error", "unset"] }
+  },
+  {
+    "type": "option",
+    "key": "neri_assertion_helpers",
+    "documentation": "Comma-separated, case-sensitive assertion helper names. Use / as the qualification separator; a final * matches a name prefix (for example, test/assert*).",
+    "value": {
+      "type": "union",
+      "values": [
+        { "type": "list", "values": [{ "type": "text" }], "min_length": 1, "allow_repetitions": true },
+        { "type": "text" }
+      ]
+    }
+  }
+]
