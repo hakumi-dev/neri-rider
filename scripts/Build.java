@@ -39,7 +39,9 @@ class Build {
         }
         Path root = Path.of("").toAbsolutePath();
         Path rider = Path.of(args[0]).toAbsolutePath();
-        String product = Files.readString(rider.resolve("product-info.json"));
+        Path productInfo = rider.resolve("product-info.json");
+        if (!Files.isRegularFile(productInfo)) productInfo = rider.resolve("Resources/product-info.json");
+        String product = Files.readString(productInfo);
         if (!product.matches("(?s).*\"productCode\"\\s*:\\s*\"RD\".*") ||
                 !product.matches("(?s).*\"buildNumber\"\\s*:\\s*\"262\\..*")) {
             throw new IllegalArgumentException("Rider platform 262 required");
@@ -80,9 +82,10 @@ class Build {
                 if (!file.getFileName().toString().contains("Test"))
                     jar.put(classes.relativize(file).toString().replace(File.separatorChar, '/'), Files.readAllBytes(file));
             }
-            jar.put("META-INF/plugin.xml", Files.readAllBytes(descriptor));
-            jar.put("META-INF/neri-editorconfig.xml", Files.readAllBytes(root.resolve("src/main/resources/META-INF/neri-editorconfig.xml")));
-            jar.put("schemas/neri-editorconfig.json", Files.readAllBytes(root.resolve("src/main/resources/schemas/neri-editorconfig.json")));
+            Path resources = root.resolve("src/main/resources");
+            for (Path file : files(resources, "")) {
+                jar.put(resources.relativize(file).toString().replace(File.separatorChar, '/'), Files.readAllBytes(file));
+            }
             Map<String, byte[]> zip = new TreeMap<>();
             zip.put("neri/lib/neri.jar", archive(jar));
             for (Path file : files(root.resolve("bundles/neri"), "")) {
